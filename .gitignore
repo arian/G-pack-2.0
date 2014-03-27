@@ -11,3 +11,8 @@
 *.lai
 *.la
 *.a
+lexer.cc
+parser.cc
+parser.h
+planner
+tags
