@@ -9,9 +9,9 @@ DEFS	=	-DNO_STRICT
 ODEFS	=	-DNDEBUG -DNO_STRICT
 
 LDFLAGS	=	#-R /opt/sfw/gcc-3.4.1/lib
-#CFLAGS	=	-Wno-deprecated -g -Wall $(DEFS)
+CFLAGS	=	-Wno-deprecated -g -Wall $(DEFS)
 # COMMENT OUT THE LINE BELOW AND UNCOMMENT THE LINE ABOVE TO COMPILE IN DEBUG MODE W/O OPTIMIZATIONS
-CFLAGS	=	-Wno-deprecated -O3 -s -Wall $(ODEFS)
+#CFLAGS	=	-Wno-deprecated -O3 -s -Wall $(ODEFS)
 LIBS	=	-lnsl -lpthread
 CC	=	gcc
 C++	=	g++

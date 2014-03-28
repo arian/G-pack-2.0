@@ -330,11 +330,6 @@ main( int argc, char **argv )
       return( -1 );
     }
 
-  determinizeSingleOutcome(std::cout, problem);
-  std::cout << "PROBLEM: \n" << *problem << "\n";
-
-  return 0;
-
   if( gpt::verbosity >= 300 )
     {
       std::cout << "<domain-begin>" << std::endl
@@ -364,6 +359,13 @@ main( int argc, char **argv )
 
   if( gpt::verbosity >= 300 )
     std::cout << "**" << std::endl;
+
+
+  determinizeSingleOutcome(std::cout, problem);
+  std::cout << "PROBLEM: \n" << *problem << "\n";
+
+  return 0;
+
 
   std::cout << "<begin-session>" << std::endl;
 
