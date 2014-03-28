@@ -1,7 +1,8 @@
 OBJ	=	actions.o algorithms.o atom_states.o client.o domains.o effects.o \
 		exceptions.o expressions.o formulas.o functions.o global.o graph.o hash.o \
 		heuristics.o main.o md4c.o parser.o lexer.o planners.o predicates.o \
-		problems.o requirements.o strxml.o terms.o types.o utils.o
+		problems.o requirements.o strxml.o terms.o types.o utils.o \
+		determinization.o
 
 DEFS	=	-DNO_STRICT
 #DEFS	=	-DMEM_DEBUG -DATOM_STATES -DNO_STRICT
@@ -108,3 +109,4 @@ types.o: global.h types.h hashing.h
 utils.o: states.h utils.h global.h md4.h
 md4c.o: md4.h
 mutex.o: parser.h
+determinization.o: determinization.h problems.h

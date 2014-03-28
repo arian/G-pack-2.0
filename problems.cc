@@ -38,11 +38,11 @@ problem_t::atom_hash_get( const Atom& atom, bool negated )
   if( it == atom_hash_.end() )
     {
       StateFormula::register_use( &atom );
-      
-      if( no_more_atoms_ ) 
+
+      if( no_more_atoms_ )
 	throw Exception( "sorry, no more atoms available" );
 
-      if( atom_index_ == USHORT_MAX ) 
+      if( atom_index_ == USHORT_MAX )
 	throw Exception( "maximum number of atoms reached" );
 
       atom_hash_.insert( std::make_pair( &atom, atom_index_ ) );
@@ -65,7 +65,7 @@ problem_t::atom_inv_hash_get( ushort_t atom )
 ushort_t
 problem_t::fluent_hash_get( const Application& app )
 {
-  std::map<const Application*,ushort_t>::const_iterator it 
+  std::map<const Application*,ushort_t>::const_iterator it
                                                     = fluent_hash_.find( &app );
   if( it == fluent_hash_.end() )
     {
@@ -87,14 +87,14 @@ problem_t::fluent_inv_hash_get( ushort_t fluent )
   return( it == fluent_inv_hash_.end() ? NULL : (*it).second );
 }
 
-problem_t* 
+problem_t*
 problem_t::find_problem( const std::string& name )
 {
   ProblemMap::const_iterator pi = problems.find( name );
   return( (pi!=problems.end()?(*pi).second:NULL) );
 }
 
-const problem_t* 
+const problem_t*
 problem_t::find( const std::string& name )
 {
   ProblemMap::const_iterator pi = problems.find( name );
@@ -137,9 +137,9 @@ problem_t::allocate( const std::string &name, const problem_t &problem )
 
 problem_t::problem_t( const std::string &name, const problem_t &problem )
   : ref_count_(0), name_(name), max_reward_(0), domain_(&problem.domain()),
-    terms_(TermTable(problem.domain().terms())), 
-    goal_(&problem.goal()), metric_(problem.metric()),  
-    horizon_(problem.horizon()), discount_factor_(problem.discount_factor()), 
+    terms_(TermTable(problem.domain().terms())),
+    goal_(&problem.goal()), metric_(problem.metric()),
+    horizon_(problem.horizon()), discount_factor_(problem.discount_factor()),
     nprec_(false), goal_atom_(false), application_graph_(NULL), noopIdx_(0)
 {
   problem_t::register_use( this );
@@ -180,9 +180,9 @@ problem_t::problem_t( const std::string &name, const problem_t &problem )
 }
 
 problem_t::problem_t( const std::string &name, const Domain &domain )
-  : ref_count_(0), name_(name), max_reward_(0), domain_(&domain), 
-    terms_(TermTable(domain.terms())), 
-    goal_(&StateFormula::FALSE), metric_(MINIMIZE_EXPECTED_COST), 
+  : ref_count_(0), name_(name), max_reward_(0), domain_(&domain),
+    terms_(TermTable(domain.terms())),
+    goal_(&StateFormula::FALSE), metric_(MINIMIZE_EXPECTED_COST),
     horizon_(UNSPECIFIED), discount_factor_(UNSPECIFIED),
     nprec_(false), goal_atom_(false), application_graph_(NULL), noopIdx_(0)
 {
@@ -198,23 +198,23 @@ problem_t::~problem_t()
 
   StateFormula::unregister_use( goal_ );
 
-  for( AtomSet::const_iterator ai = init_atoms_.begin(); 
+  for( AtomSet::const_iterator ai = init_atoms_.begin();
                                                  ai != init_atoms_.end(); ++ai )
     StateFormula::unregister_use( *ai );
 
-  for( ValueMap::const_iterator vi = init_fluents_.begin(); 
+  for( ValueMap::const_iterator vi = init_fluents_.begin();
                                                vi != init_fluents_.end(); ++vi )
     Expression::unregister_use( (*vi).first );
 
-  for( EffectList::const_iterator ei = init_effects_.begin(); 
+  for( EffectList::const_iterator ei = init_effects_.begin();
                                                ei != init_effects_.end(); ++ei )
     Effect::unregister_use( *ei );
 
-  for( ActionList::const_iterator ai = actions().begin(); 
+  for( ActionList::const_iterator ai = actions().begin();
                                                    ai != actions().end(); ++ai )
     Action::unregister_use( *ai );
 
-  for( actionList_t::const_iterator ai = actionsT().begin(); 
+  for( actionList_t::const_iterator ai = actionsT().begin();
                                                   ai != actionsT().end(); ++ai )
     action_t::unregister_use( *ai );
 
@@ -226,7 +226,7 @@ problem_t::~problem_t()
     }
 }
 
-void 
+void
 problem_t::add_init_atom( const Atom& atom )
 {
   if( init_atoms_.find( &atom ) == init_atoms_.end() )
@@ -236,7 +236,7 @@ problem_t::add_init_atom( const Atom& atom )
     }
 }
 
-void 
+void
 problem_t::add_init_fluent( const Application& application, const double& value)
 {
   if( init_fluents_.find( &application ) == init_fluents_.end() )
@@ -248,14 +248,14 @@ problem_t::add_init_fluent( const Application& application, const double& value)
     init_fluents_[&application] = value;
 }
 
-void 
+void
 problem_t::add_init_effect( const Effect& effect )
 {
   Effect::register_use( &effect );
   init_effects_.push_back( &effect );
 }
 
-void 
+void
 problem_t::set_goal( const StateFormula& goal )
 {
   if( &goal != goal_ )
@@ -268,7 +268,7 @@ problem_t::set_goal( const StateFormula& goal )
 
 
 
-void 
+void
 problem_t::instantiate_actions( void )
 {
   const StateFormula *ngoal = &goal().instantiation( SubstitutionMap(), *this );
@@ -288,14 +288,14 @@ problem_t::instantiate_actions( void )
 const Application *action_t::app_;
 const Application *problem_t::app_;
 
-void 
+void
 problem_t::flatten( void )
 {
   // goal
   const StateFormula &g = goal().flatten();
   g.translate( goalT_ );
   StateFormula::unregister_use( &g );
-  
+
   std::pair<Function,bool> fp = domain().functions().find_function("reward");
   if (fp.second == false)
     {
@@ -310,7 +310,7 @@ problem_t::flatten( void )
   std::map<ushort_t, std::list<const effect_t*> >* mapNoopsEffects = NULL;
 
   size_t noopIdx = 0;
-  for( ActionList::const_iterator it = actions().begin(); 
+  for( ActionList::const_iterator it = actions().begin();
                                                    it != actions().end(); ++it )
     {
       action_t *action = &(*it)->translate( *this );
@@ -340,7 +340,7 @@ problem_t::flatten( void )
 
 // Fills the provided object list with objects (including constants
 // declared in the domain) that are compatible with the given type.
-void 
+void
 problem_t::compatible_objects( ObjectList& objects, Type type ) const
 {
   domain().compatible_constants( objects, type );
@@ -380,39 +380,39 @@ problem_t::complete_state( state_t &state ) const
     }
 }
 
-void 
+void
 problem_t::enabled_actions( ActionList& actions, const state_t& state ) const
 {
-  for( ActionList::const_iterator ai = actions_.begin(); ai != actions_.end(); 
+  for( ActionList::const_iterator ai = actions_.begin(); ai != actions_.end();
                                                                           ++ai )
     if( (*ai)->enabled( state ) ) actions.push_back( *ai );
 }
 
-void 
+void
 problem_t::print( std::ostream& os, const StateFormula &formula ) const
 {
   formula.print( os, domain_->predicates(), domain_->functions(), terms() );
 }
 
-void 
+void
 problem_t::print( std::ostream& os, const Application &app ) const
 {
   app.print( os, domain_->functions(), terms() );
 }
 
-void 
+void
 problem_t::print( std::ostream& os, const Action &action ) const
 {
   action.print( os, terms() );
 }
 
-void 
+void
 problem_t::print_full( std::ostream& os, const Action &action ) const
 {
   action.print_full( os, domain_->predicates(), domain_->functions(), terms() );
 }
 
-double 
+double
 problem_t::eval_action( action_t &action, const state_t &state ) const
 {
   ValueMap vm;
@@ -420,7 +420,7 @@ problem_t::eval_action( action_t &action, const state_t &state ) const
   state_t dummy;
   std::list<const effect_t*>* rewardEffs = action.get_reward_effs();
 
-  for (std::list<const effect_t*>::iterator it_eff = rewardEffs->begin(); 
+  for (std::list<const effect_t*>::iterator it_eff = rewardEffs->begin();
                                           it_eff != rewardEffs->end(); it_eff++)
     {
       (*it_eff)->affect( state, dummy, &vm);
@@ -429,7 +429,7 @@ problem_t::eval_action( action_t &action, const state_t &state ) const
   return vm[app_];
 }
 
-double 
+double
 problem_t::eval_all_actions( const state_t &state ) const
 {
   double max_rew = -1000000000;
@@ -446,13 +446,13 @@ void
 problem_t::initial_states( std::pair<state_t*,double> *list ) const
 {
   state_t *state = new state_t;
-  for( AtomSet::const_iterator ai = init_atoms().begin(); 
+  for( AtomSet::const_iterator ai = init_atoms().begin();
                                                 ai != init_atoms().end(); ++ai )
     if( !domain().predicates().static_predicate( (*ai)->predicate() ) )
       state->add( **ai );
 
 #ifdef FULL_STATES
-  for( ValueMap::const_iterator vi = init_fluents().begin(); 
+  for( ValueMap::const_iterator vi = init_fluents().begin();
                                               vi != init_fluents().end(); ++vi )
     {
       Function function = (*vi).first->function();
@@ -464,17 +464,17 @@ problem_t::initial_states( std::pair<state_t*,double> *list ) const
   complete_state( *state );
   state->make_digest();
   const stateProbList_t *state_list = new stateProbList_t( state, 1 );
-  
+
   // In this implementation, we ignore initial effects. Initial effects can
   // change the state of the world before the agent gets to execute any actions.
   // Thus, in problems with initial effects the agent could stochastically start
   // in one of several possible initial states. Here, we assume instead that
   // the initial state is deterministic and is given as part of the problem
-  // description. 
+  // description.
 
   // fill the given list wth result
   size_t i = 0;
-  for( stateProbList_t::const_iterator si = state_list->begin(); 
+  for( stateProbList_t::const_iterator si = state_list->begin();
                                                  si != state_list->end(); ++si )
     {
       *list[i].first = *(*si).first;
@@ -491,7 +491,7 @@ problem_t::analyze_symmetries( void )
 {
   atomList_t add_i, del_i, add_j, del_j;
 
-  // first: operators that everything they add is persistent and do not delete 
+  // first: operators that everything they add is persistent and do not delete
   // anything
   std::vector<const action_t*> operators;
   std::map<const action_t*,ushort_t> map;
@@ -540,7 +540,7 @@ problem_t::analyze_symmetries( void )
       add_i.clear();
     }
 
-#if 0  
+#if 0
   std::cout << "<operator-graph>: begin" << std::endl;
   operator_graph.print( std::cout );
   std::cout << "<operator-graph>: end" << std::endl;
@@ -635,7 +635,7 @@ problem_t::add_orbit( std::string *name, std::vector<const Atom*> *atoms )
 }
 
 void
-problem_t::add_system( std::string *name, 
+problem_t::add_system( std::string *name,
 		       std::vector<const std::string*> *focus,
 		       std::vector<const std::string*> *base,
 		       std::vector<const std::string*> *frame )
@@ -643,7 +643,7 @@ problem_t::add_system( std::string *name,
   systems_[*name] = new system_t( focus, base, frame );
 }
 
-std::ostream& 
+std::ostream&
 operator<<( std::ostream& os, const problem_t& p )
 {
   os << "name: " << p.name();
@@ -657,29 +657,29 @@ operator<<( std::ostream& os, const problem_t& p )
       p.domain().types().print_type( os, p.terms().type( i ) );
     }
   os << std::endl << "init:";
-  for( AtomSet::const_iterator ai = p.init_atoms_.begin(); 
+  for( AtomSet::const_iterator ai = p.init_atoms_.begin();
                                                ai != p.init_atoms_.end(); ++ai )
     {
       os << std::endl << "  ";
-      (*ai)->print( os, p.domain().predicates(), p.domain().functions(), 
+      (*ai)->print( os, p.domain().predicates(), p.domain().functions(),
 		                                                    p.terms() );
     }
-  for( ValueMap::const_iterator vi = p.init_fluents_.begin(); 
+  for( ValueMap::const_iterator vi = p.init_fluents_.begin();
                                              vi != p.init_fluents_.end(); ++vi )
     {
       os << std::endl << "  (= ";
       (*vi).first->print( os, p.domain().functions(), p.terms() );
       os << ' ' << (*vi).second << ")";
     }
-  for( EffectList::const_iterator ei = p.init_effects_.begin(); 
+  for( EffectList::const_iterator ei = p.init_effects_.begin();
                                              ei != p.init_effects_.end(); ++ei )
     {
       os << std::endl << "  ";
-      (*ei)->print( os, p.domain().predicates(), p.domain().functions(), 
+      (*ei)->print( os, p.domain().predicates(), p.domain().functions(),
 		                                                    p.terms() );
   }
   os << std::endl << "goal: ";
-  p.goal().print( os, p.domain().predicates(), p.domain().functions(), 
+  p.goal().print( os, p.domain().predicates(), p.domain().functions(),
 		                                                    p.terms() );
   os << std::endl << "metric: ";
   if( p.metric() == problem_t::MINIMIZE_EXPECTED_COST )

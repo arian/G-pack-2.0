@@ -30,7 +30,7 @@
 #include <fstream>
 #include <vector>
 
-
+#include "determinization.h"
 
 
 #ifndef CLIENT_NAME
@@ -60,18 +60,18 @@ printUsage( std::ostream &os )
      << std::endl << std::endl
      << "Options:" << std::endl << std::endl
      << "  [-e <epsilon>]            (default = 0.05) -- The convergence \n"
-     << "                                threshold" 
+     << "                                threshold"
      << std::endl
      << "  [-i <hash-size>]          (default = 1638400) -- The number of \n"
-     << "                                buckets in the state-value hash table" 
+     << "                                buckets in the state-value hash table"
      << std::endl
      << "  [-p <planner>]            (default = glutton)" << std::endl
      << "  [-r <random-seed>]        (default = 407343) -- The seed to be used\n "
-     << "                               in randomized operations" 
+     << "                               in randomized operations"
      << std::endl
-     << "  [-t <timeout>]            (default = ~50000 years) -- The approximate\n" 
+     << "  [-t <timeout>]            (default = ~50000 years) -- The approximate\n"
      <<"                                amount of time to solve the problem, \n"
-     <<"                                in seconds" 
+     <<"                                in seconds"
      << std::endl
      << std::endl
      << "  <planner>         := random | lr2tdp | glutton | gourmand" << std::endl
@@ -166,7 +166,7 @@ readArguments( int argc, char **argv, char* &hostport, char* &domain_file, char*
 /*
   Parses an input file with a domain description, a problem description, or both.
 */
-static bool 
+static bool
 read_file( const char* name )
 {
   yyin = fopen( name, "r" );
@@ -199,7 +199,7 @@ read_file( const char* name )
   Connects to the competition server running on the specified machine at the
   specified port.
 */
-static int 
+static int
 connect( const char *hostname, int port )
 {
   struct hostent *host = ::gethostbyname(hostname);
@@ -215,7 +215,7 @@ connect( const char *hostname, int port )
       perror( "socket" );
       return( -1 );
     }
-  
+
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
   addr.sin_port = htons( port );
@@ -269,7 +269,7 @@ createPlanner( const problem_t &problem, char *algorithm )
 /*
   The planner's entry point.
 */
-int 
+int
 main( int argc, char **argv )
 {
   planner_t *planner;
@@ -310,24 +310,30 @@ main( int argc, char **argv )
 	}
     }
 
-  // otherwise, assume that the domain description is in the problem file and 
+  // otherwise, assume that the domain description is in the problem file and
   // parse that
   if( !read_file( problem_file ) )
     {
-      std::cout << "<main>: ERROR: couldn't read problem file `" 
+      std::cout << "<main>: ERROR: couldn't read problem file `"
 		<< problem_file << "'" << std::endl;
       return( -1 );
     }
 
   // obtain problem from file
   problem_t *problem = (problem_t*)problem_t::find( prob );
+
   if( !problem )
     {
-      std::cout << "<main>: ERROR: problem `" << prob 
+      std::cout << "<main>: ERROR: problem `" << prob
 		<< "' is not defined in file '"
 		<< problem_file << "'" << std::endl;
       return( -1 );
     }
+
+  determinizeSingleOutcome(std::cout, problem);
+  std::cout << "PROBLEM: \n" << *problem << "\n";
+
+  return 0;
 
   if( gpt::verbosity >= 300 )
     {
@@ -361,7 +367,7 @@ main( int argc, char **argv )
 
   std::cout << "<begin-session>" << std::endl;
 
-  
+
   // bind to the specified socket on the specified machine
   char *host = strtok( hostport, ":" );
   char *portstr = strtok( NULL , ":" );
@@ -379,7 +385,7 @@ main( int argc, char **argv )
   /*
     Initialize the planning algorithm + heuristic and interact with the server
     This involves intiating a session with the server, receiving states from it,
-    planning, and sending the actions recommended by the planner for the 
+    planning, and sending the actions recommended by the planner for the
     received states back to the server.
   */
   try
@@ -390,21 +396,21 @@ main( int argc, char **argv )
       tms start_time;
       times (&start_time);
 
-      // This is the line that initiates all the planning 
+      // This is the line that initiates all the planning
       XMLClient_t client( planner, problem );
       client.do_session(CLIENT_NAME, socket);
       tms end_time;
       times(&end_time);
 
       //*** COMPETITION-SPECIFIC LOGIC STARTS HERE **************************
-      
+
       // See if we have enough time to attempt solving this problem
-      // again with different parameter values. There parameter values are 
+      // again with different parameter values. There parameter values are
       // likely to result in a better policy than the one we got in the
-      // previous attempt, but may make the planning process take longer 
-      // than before. Thus, we want to attempt is only if we still have a lot 
+      // previous attempt, but may make the planning process take longer
+      // than before. Thus, we want to attempt is only if we still have a lot
       // of time left.
-      if (elapsed_time(start_time, end_time) < 2.0 / 7.0 * gpt::timeout 
+      if (elapsed_time(start_time, end_time) < 2.0 / 7.0 * gpt::timeout
 	  && gpt::solved_completely && !gpt::out_of_memory)
 	{
 	  std::cout<<"\n\nTOTAL TIME GIVEN "<< gpt::timeout <<std::endl;
@@ -434,13 +440,13 @@ main( int argc, char **argv )
       // policy the planner has access to. If so, do another session with
       // the problem server and submit the planner's best default policy
       // during that session.
-      if (gpt::previous_solution_attempt_reward 
+      if (gpt::previous_solution_attempt_reward
 	  < gpt::best_default_policy_reward)
 	{
 	  std::cout<<"\n\nTHE EXPECTED REWARD OF THE PREVIOUSLY SUBMITTED "
 		   <<"POLICY ("<<gpt::previous_solution_attempt_reward<<") "
 		   <<"IS LOWER THAN THE EXPECTED REWARD OF THE BEST DEFAULT "
-		   <<"POLICY ("<<gpt::best_default_policy_reward<<"). " 
+		   <<"POLICY ("<<gpt::best_default_policy_reward<<"). "
 		   <<"SUBMITTING THE DEFAULT POLICY... \n\n"
 		   <<std::endl;
 	  gpt::use_best_default_policy = true;
@@ -472,7 +478,7 @@ main( int argc, char **argv )
   tms finish;
   times(&finish);
   delete planner;
-  
+
   // destroy the heuristics
   while( !gpt::hstack.empty() )
     {
@@ -490,9 +496,9 @@ main( int argc, char **argv )
   std::cerr << "<end-session>" << std::endl;
 #endif
   std::cout << "<end-session>" << std::endl;
-  std::cout << "Planning and execution took " << elapsed_time(start, finish) 
+  std::cout << "Planning and execution took " << elapsed_time(start, finish)
 	    <<" seconds"<< std::endl;
- 
+
   return( 0 );
 }
 
